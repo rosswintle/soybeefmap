@@ -1,0 +1,1761 @@
+<!doctype html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+      <title>Chinese investments in South American soy and beef</title>
+      <meta name="description" content="Chinese investments in South American soy and beef, China Dialogue">
+      <meta name="author" content="Julia Janicki">
+      <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+      <link href="https://fonts.googleapis.com/css2?family=Enriqueta:wght@400;500;600;700&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css?family=Work+Sans:300,400,500,700&display=swap" rel="stylesheet">
+      <script src='https://api.mapbox.com/mapbox-gl-js/v1.6.0/mapbox-gl.js'></script>
+      <link href='https://api.mapbox.com/mapbox-gl-js/v1.6.0/mapbox-gl.css' rel='stylesheet' />
+      <script src='https://cdnjs.cloudflare.com/ajax/libs/tabletop.js/1.5.1/tabletop.min.js'></script>
+      <style>
+         body {
+           margin: 0;
+           padding: 0;
+           color: #0C1B34;
+           font-family: 'Work Sans', serif;
+         }
+         #map {
+           position: absolute;
+           top: 0;
+           bottom: 0;
+           width: 100%;
+         }
+         h1 {
+           font-size: 18px;
+           line-height: 25px;
+         }
+         h2 {
+           font-size: 16px;
+           line-height: 20px;
+           margin-bottom: 10px;
+         }
+         a {
+           text-decoration: none;
+           color: #2dc4b2;
+         }
+         #console {
+           position: absolute;
+           width: 350px;
+           margin: 10px;
+           padding: 10px 20px 10px 30px;
+           background-color: #fffcf0;
+           border-radius: 5px;
+           z-index: 9;
+           transition: 0.3s ease-in-out;
+           box-shadow: 0 1px 1px 0 rgba(66, 66, 66, 0.08), 0 1px 3px 1px rgba(66, 66, 66, 0.16);
+         }
+         #chart{
+           margin-left:-15px;
+           margin-top:-15px;
+         }
+         .active{
+           transform:translate3d(-330px,0,0);
+           transition: 0.3s ease-in-out;
+         }
+         #toggleConsole{
+           position:absolute;
+           right:5px;
+           top:0px;
+         }
+         #toggleConsole img{
+           width:16px;
+           opacity: 0.7;
+         }
+         #toggleConsole img:hover{
+           opacity: 0.5;
+           transition: all .5s ease;
+           cursor:pointer;
+         }
+         .flip{
+           -webkit-transform: scaleX(-1);
+           transform: scaleX(-1);
+           opacity: 1;
+         }
+         #console h1,
+         #console h2 {
+           text-align: left;
+         }
+         .verticalLine {
+           margin-right: 5px;
+           border-right: 0.3px solid #ECE8E1;
+         }
+         #start {
+           position: relative;
+           display:inline;
+           margin-top: 10px;
+           margin-left: -10px;
+         }
+         #end {
+           position: relative;
+           display:inline;
+           margin-top: 10px;
+           margin-left: 180px;
+         }
+         #title {
+           font-family: 'Enriqueta', serif;
+           color: #0c1b34;
+           font-weight: 700;
+           margin-left: -10px;
+         }
+         #product {
+           margin-left: -10px;
+         }
+         #play img,#stop img{
+           width:20px;
+           height:20px;
+           margin-left: -10px;
+         }
+         #stop img{
+           margin-left: 10px;
+         }
+         #play img:hover,#stop img:hover{
+           cursor:pointer;
+           opacity: 0.6;
+           transition: all 0.5s ease;
+         }
+         .mapboxgl-popup {
+           max-width: 300px !important;
+           font-family: 'Work Sans', sans-serif;
+           text-align: left;
+         }
+         .mapboxgl-popup-content {
+           font-family: 'Work Sans', sans-serif;
+           padding: 0;
+         }
+         .mapboxgl-popup-content-wrapper {
+           padding: 1%;
+         }
+         .mapboxgl-popup-content h3 {
+           text-align: left;
+           font-size:16px;
+           margin: 0;
+           display: block;
+           padding: 15px;
+           font-weight: 700;
+           margin-top: -5px;
+         }
+         .mapboxgl-popup.logistics h3 {
+           background: #007979 !important;
+           color: #fff;
+         }
+         .mapboxgl-popup.production h3 {
+           background: #D66951 !important;
+           color: #fff;
+         }
+         .mapboxgl-popup.processing h3 {
+           background: #67C14D !important;
+           color: #fff;
+         }
+         .mapboxgl-popup.other h3 {
+           background: #FFC554 !important;
+           color: #fff;
+         }
+         .mapboxgl-popup-content h4 {
+           margin: 0;
+           display: block;
+           font-size:14px;
+           padding: 10px 3px 10px 10px;
+           font-weight: 400;
+         }
+         .mapboxgl-container {
+           cursor: pointer;
+         }
+         .mapboxgl-popup-anchor-top>.mapboxgl-popup-content {
+           margin-top: 3px;
+         }
+         .mapboxgl-popup-anchor-top>.mapboxgl-popup-tip {
+           border-bottom-color: rgb(61, 59, 59);
+         }
+         .mapboxgl-popup-close-button{
+           transform:scale(2);
+           color:white;
+           padding:0px;
+           margin-right: 10px;
+         }
+         .mapboxgl-popup-close-button:hover,.mapboxgl-popup-close-button:active,.mapboxgl-popup-close-button:target{
+           background:none !important;
+           color:#cfcfcf;
+           transition: all 0.5s ease;
+         }
+         .toggle {
+           position: relative;
+           height: 14px;
+           width: 50px;
+           border-radius: 15px;
+           background: #cfcfcf;
+           margin: 8px 0;
+         }
+         .toggle input {
+           opacity: 0;
+           width: 100%;
+           height: 200%;
+           position: absolute;
+           top: -7px;
+           left: 0;
+           z-index: 2;
+           margin: 0
+         }
+         .toggle input:nth-child(2):checked {
+           z-index: 1;
+         }
+         .toggle__pointer {
+           position: absolute;
+           top: -7px;
+           left: 0;
+           width: 28px;
+           height: 28px;
+           border-radius: 15px;
+           background-color: #59BECD;
+           -webkit-transition: left .15s ease-out;
+           transition: left .15s ease-out;
+         }
+         .toggle input:nth-child(2):checked + .toggle__pointer {
+           left: 22px;
+           background-color: #9573DE;
+         }
+         #filters{
+           margin-top: 20px;
+         }
+         .legend.label{
+           display:inline;
+         }
+         .legend img{
+           width:10px;
+           height:10px;
+           display:inline;
+         }
+         .label{
+           color:black;
+           font-size:12px;
+           font-weight:400;
+         }
+         .instruction{
+           margin-left: -15px;
+           margin-top:20px;
+         }
+         .instruction p{
+           color:#DF4C3B;
+           font-weight: 700;
+           font-size:12px;
+         }
+         .button {
+           margin-bottom: 10px;
+           margin-top: 10px;
+           margin-left: auto;
+           margin-right: auto;
+           display: block;
+           font-weight: 700;
+           font-size: 12px;
+           line-height: 1.5;
+           text-transform: uppercase;
+           background-color: none;
+           max-width: 200px;
+           text-align: center;
+           -webkit-transition: all .5s ease;
+           -moz-transition: all .5s ease;
+           -ms-transition: all .5s ease;
+           transition: all .5s ease;
+           padding: 10px;
+         }
+         .button.logistics{
+           color: #007979;
+           border: 1.5px solid  #007979;
+         }
+         .button.production{
+           color: #D66951;
+           border: 1.5px solid  #D66951;
+         }
+         .button.processing{
+           color: #67C14D;
+           border: 1.5px solid  #67C14D;
+         }
+         .button.other{
+           color: #FFC554;
+           border: 1.5px solid  #FFC554;
+         }
+         .button.logistics a{
+           color: #007979;
+         }
+         .button.production a{
+           color: #D66951;
+         }
+         .button.processing a{
+           color: #67C14D;
+         }
+         .button.other a{
+           color: #FFC554;
+         }
+         .button:hover {
+           cursor: pointer;
+           -webkit-transition: all .5s ease;
+           -moz-transition: all .5s ease;
+           -ms-transition: all .5s ease;
+           transition: all .5s ease;
+         }
+         a:hover{
+           text-decoration: none !important;
+         }
+         .item{
+           display: inline-block;
+           vertical-align: middle;
+           margin-right: 10px;
+         }
+         .item2{
+           display: inline-block;
+           margin-left: 8px;
+           font-size: 12px;
+         }
+         .item3{
+           display: inline-block;
+           margin-left: 6px;
+           font-size: 12px;
+           width:20px;
+           height:20px;
+         }
+         #active-date2{
+         /* font-size:14px; */
+         }
+         #chartTitle{
+           margin-left: -10px;
+         }
+         #activeDateTitle{
+           font-weight: 700;
+           margin-left: 10px;
+         }
+         .popupTitle{
+           font-family: 'Enriqueta', serif;
+         }
+         .mapboxgl-popup-anchor-top>.mapboxgl-popup-tip {
+         /* border-bottom-color: rgb(61, 59, 59); */
+         }
+         .arrow{
+           width:35px;
+           vertical-align: middle;
+           margin-top:-10px;
+         }
+         #dropdownContainer{
+         margin: auto;
+         padding: 0;
+         vertical-align: middle;
+         }
+         #yearTitle{
+         vertical-align: middle;
+         }
+         select{
+         font-size:16px;
+         margin-left: -10px;
+         margin-bottom: 10px;
+         }
+         #loading {
+         top: 0;
+         left: 0;
+         position: fixed;
+         display: block;
+         opacity: .7;
+         background-color: #fff;
+         z-index: 99;
+         }
+         #loading-image {
+         position: relative;
+         margin-left: auto;
+         margin-right: auto;
+         margin-top: calc(50vh - 80px);
+         z-index: 100;
+         }
+         #loading{
+         width: 100%;
+         text-align: center;
+         height: 100%;
+         }
+
+         #minCircle{
+           width: 13px;
+           height: 13px;
+         }
+
+         #maxCircle{
+           width: 60px;
+           height: 60px;
+         }
+
+         #legendInstruction p:hover{
+           cursor:pointer;
+           opacity: 0.7;
+           transition: all .4s ease;
+         }
+         #logo{
+           position: absolute;
+           bottom:22px;
+           right:0px;
+         }
+         #logo img{
+           width:200px;
+         }
+         @media screen and (max-width: 800px) {
+           .active{
+             transform:translate3d(-230px,0,0);
+           }
+           .label{
+             font-size:10px;
+             margin-left:-5px;
+           }
+           .item2{
+             font-size:10px;
+             margin-left:2px;
+           }
+           h1{
+             font-size:16px;
+           }
+           h2{
+             font-size:12px;
+           }
+           #console{
+             padding: 10px 20px;
+           }
+           #title{
+             margin-top:-10px;
+           }
+           #start{
+             font-size: 12px;
+           }
+           #end{
+             font-size: 12px;
+           }
+           .mapboxgl-popup {
+             max-width: 250px !important;
+           }
+           #legendCol1{
+             margin-left: -10px !important;
+           }
+           #legendCol2{
+             margin-left: -20px !important;
+           }
+         }
+         @media screen and (max-width: 500px) {
+           body{
+           font-size:11px !important;
+           }
+           #play img,#stop img{
+             width:15px;
+             height:15px;
+           }
+           .active{
+           transform:translate3d(-230px,0,0);
+           }
+           .label{
+           font-size:10px;
+           margin-left:-5px;
+           }
+           .item2{
+           font-size:9px;
+           margin-left:1px;
+           }
+           .item3{
+             width: 15px;
+             height: 15px;
+           }
+           .legendTitleAll{
+             margin-top: -5px;
+           }
+           #toggleWrapper{
+             margin-top: -10px;
+           }
+           #sliderControls{
+             margin-top: -10px;
+           }
+           h1{
+           font-size:14px;
+           }
+           h2{
+           font-size:14px;
+           }
+           #active-date2{
+           font-size: 10px;
+           }
+           #start{
+           font-size: 11px;
+           }
+           #end{
+           font-size: 11px;
+           }
+           #legendCol1{
+           margin-left: -10px !important;
+           }
+           #legendCol2{
+           margin-left: -20px !important;
+           }
+           .mapboxgl-popup{
+              transform:none !important;
+              top: 20px;
+              left: 0;
+              right: 0;
+              margin-left: auto;
+              margin-right: auto;
+          }
+          .mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+          .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+          .mapboxgl-popup-anchor-center .mapboxgl-popup-tip,
+          .mapboxgl-popup-anchor-left .mapboxgl-popup-tip,
+          .mapboxgl-popup-anchor-right .mapboxgl-popup-tip,
+          .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip,
+          .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+          .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip,
+          .mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip{
+              display:none !important;
+          }
+          #logo{
+            position: absolute;
+            bottom:15px;
+            right:0px;
+          }
+          #logo img{
+            width:150px;
+          }
+         }
+
+      </style>
+   </head>
+   <body>
+      <div id='map'></div>
+      <div id='logo'>
+        <img src="./logo.png"/>
+      </div>
+      <div id='console'>
+         <div class="verticalLine">
+            <span id="toggleConsole">
+            <img src="toggle.png" />
+            </span>
+            <h1 id='title'>Chinese investments in South American soy and beef (2007-2019)</h1>
+            <div class="itemWrapper" id="toggleWrapper">
+               <div class="item">
+                  <h2 id="product"><span id="soyTitle">SOY</span> / <span id="beefTitle">BEEF</span></h2>
+               </div>
+               <div class='row toggle item' id='filters'>
+                  <input id='soy' type="radio" value="soy" name="toggle" checked='checked'>
+                  <input id='beef' type="radio" value="beef" name="toggle">
+                  <div class="toggle__pointer"></div>
+               </div>
+            </div>
+            <div class="itemWrapper" id="sliderControls">
+               <div class="item containerButton">
+                  <span id="play">
+                  <img src="play.png" />
+                  </span>
+                  <span id="stop">
+                  <img src="pause.png" />
+                  </span>
+               </div>
+               <div class="item">
+                  <h2 id="date"><span id="activeDateTitle">Date: </span><span id="active-date2">2020 January</span></h2>
+               </div>
+            </div>
+            <div class='session' id='sliderbar'>
+               <input id='slider' class='row' type='range' min='0' max='' step='1' value='' />
+               <div id="wrapper">
+                  <p id="start"></p>
+                  <p id="end"></p>
+               </div>
+            </div>
+            <div class="custom-dropdown custom-dropdown--white itemWrapper" id="dropdownContainer">
+               <!-- <h2 id="yearTitle" class="item"><span id="activeYearTitle">Year: </span></h2> -->
+               <select class="custom-dropdown__select custom-dropdown__select--white item" id="dropdown">
+               </select>
+            </div>
+            <h2 id="chartTitle">Cumulative investment over time (US$ billions)</h2>
+            <div id="chart">
+            </div>
+            <div class="instruction" id="legendInstruction">
+              <p>Click to show legend </p>
+            </div>
+            <div id="allLegend">
+              <div class='row legend'>
+                 <h2 id="legendTitle" class="legendTitleAll"> Sectors </h2>
+                 <div id="legendCol1" class="col-xs-6">
+                    <img src="legend0.svg" />
+                    <div class='label'>Logistics</div>
+                    <br>
+                    <img src="legend1.svg" />
+                    <div class='label'>Production</div>
+                 </div>
+                 <div id="legendCol2" class="">
+                    <img src="legend2.svg" />
+                    <div class='label'>Processing</div>
+                    <br>
+                    <img src="legend3.svg" />
+                    <div class='label'>Vertically integrated</div>
+                 </div>
+              </div>
+              <div class='row itemWrapper'>
+                 <h2 class=""> Investment </h2>
+                 <div class="">
+                    <img id="minCircle" class='item2' src="legend4.svg" /img>
+                    <p id="minCircleVal" class='item2'></p>
+                    <img id="maxCircle" class='item2' src="legend4.svg" /img>
+                    <p id="maxCircleVal" class='item2'></p>
+                 </div>
+              </div>
+              <div class='row itemWrapper'>
+                 <h2 class="legendTitleAll"> Biomes </h2>
+                 <div class="">
+                    <img class='item3' src="legend5.svg" /img>
+                    <p class='item2'>Amazon</p>
+                    <img class='item3' src="legend6.svg" /img>
+                    <p class='item2'>Cerrado</p>
+                    <img class='item3' src="legend7.svg" /img>
+                    <p class='item2'>Gran Chaco</p>
+                 </div>
+              </div>
+            </div>
+            <div class="instruction itemWrapper">
+               <p class="item">Click on the points for more information</p>
+               <img class="item arrow" src="arrow.svg"/>
+            </div>
+         </div>
+         <!-- end line -->
+      </div>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+      <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.14.2/d3.js"></script>
+      <script>
+         var windowWidth = $(window).width();
+         var windowHeight = $(window).height();
+         var viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+         var viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+         var mobile = false;
+         var iphone = false;
+         var safari = false;
+
+         $(window).resize(function() {
+             if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
+                 location.reload();
+                 return;
+             }
+         });
+
+         if (/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+             mobile = true;
+         }
+
+         if (/iPhone/i.test(navigator.userAgent)) {
+             iphone = true;
+         }else{
+           console.log(/iPhone/i.test(navigator.userAgent))
+         }
+
+         //if Safari
+         var ua = navigator.userAgent.toLowerCase();
+          if (ua.indexOf('safari') != -1) {
+            if (ua.indexOf('chrome') > -1) { // Chrome
+            } else {// Safari
+              safari = true;
+            }
+          }
+
+         // if(viewportWidth<600){
+         //   iphone = true;
+         // }
+
+         var legendShow = false;
+
+         if(viewportWidth<800){
+           $("#chart").css("display","none");
+           $("#chartTitle").css("display","none");
+           // $("#legendTitle").css("display","none");
+           $(".instruction").css("display","none");
+           $(".arrow").css("display","none");
+           $("#console").css("width","250px");
+           $("#end").css("margin-left","100px");
+           $("#legendInstruction").css("display","inherit");
+           $('#allLegend').hide();
+         }else{
+           $("#legendInstruction").css("display","none");
+         }
+
+         if(iphone || safari){
+           $("#sliderbar").css("display","none");
+           $("#sliderControls").css("display","none");
+         }else{
+           $("#dropdownContainer").css("display","none");
+         }
+
+         if(safari){
+           $("#chart").css("display","none");
+           $("#chartTitle").css("display","none");
+         }
+
+
+
+
+
+         mapboxgl.accessToken = 'pk.eyJ1IjoiZGlhbG9nb2NoaW5vIiwiYSI6ImNrOWNtbzRoNzA1M3Eza25tZ3cweGYyNjUifQ.xBZqG3UrpzYxxQOUXGqE1A';
+
+         var geoJsonData = {
+         'type': 'FeatureCollection',
+         'features': [
+           ]
+         };
+
+         $("#play img").css("opacity",1);
+         $("#stop img").css("opacity",0.6);
+
+         var soy = true;
+
+         var margin = {top:20, right:0, bottom:20,left:20},
+             width = $("#chart").parent().width(),
+             height = width-100;
+
+             if(viewportWidth<800 || iphone){
+               height = width-50;
+             }
+
+         var svg = d3.select('#chart')
+                 .append("svg").attr("id","svg")
+                  .attr("width", width)
+                  .attr("height", height)
+                  .append("g").attr("class","g")
+                  .attr("transform", "translate("+margin.left+", "+ margin.top + ")");
+
+           width = width - margin.left - margin.right;
+           height = height - margin.top - margin.bottom;
+
+          var yScale = d3.scaleLinear()
+              .range([height, 0]);
+          var xScale = d3.scaleLinear()
+              .range([0, width]);
+          var xAxis = d3.axisBottom(xScale);
+          var yAxis = d3.axisLeft(yScale);
+
+          var chart = svg.append("g").attr("transform", `translate(${margin.left},0)`);
+
+
+           // Add the X Axis
+         chart
+           .append("g").attr("class","Xaxis")
+           .attr("transform", `translate(0,${height})`);
+         // Add the Y Axis
+         chart
+           .append("g").attr("class","Yaxis")
+           .attr("transform", `translate(0, 0)`);
+
+           var line = d3.line()
+               .x(d => xScale(d.year))
+               .y(d => yScale(d.cumulative));
+
+
+         var map;
+
+         if(mobile){
+
+           map = new mapboxgl.Map({
+              container: 'map', // container element id
+              style: 'mapbox://styles/dialogochino/cka2wl2tv179p1ijwuohal0yu',
+              center: [-59.180508,-21.911851], // initial map center in [lon, lat]
+              zoom: 2,
+              minZoom:1
+          });
+
+         }else{
+
+           map = new mapboxgl.Map({
+              container: 'map', // container element id
+              style: 'mapbox://styles/dialogochino/cka2wl2tv179p1ijwuohal0yu',
+              center: [-59.180508,-21.911851], // initial map center in [lon, lat]
+              zoom: 3,
+              minZoom:2
+          });
+
+         }
+
+
+
+
+         var consoleHeight = $("#console").height()/2;
+         $("#toggleConsole").css("top",consoleHeight);
+         $("#soyTitle").css("font-weight",700);
+         $("#beefTitle").css("font-weight",400);
+
+         if(viewportWidth<800){
+           $("#legendInstruction").click(function(){
+                $('#allLegend').slideToggle('slow');
+                legendShow=!legendShow;
+                if(legendShow){
+                  $("#legendInstruction p").html("Click to hide legend");
+                  $("#toggleConsole").animate({
+                      top: 220
+                  }, 200);
+                }else{
+                  $("#legendInstruction p").html("Click to show legend");
+                  $("#toggleConsole").animate({
+                      top: consoleHeight
+                  }, 200);
+                }
+
+            });
+         }
+
+
+         map.on('load', function() {
+
+             init(); // test google sheet
+             $("#toggleConsole").click(function(){
+               $("#console").toggleClass("active");
+               $("#toggleConsole img").toggleClass("flip");
+             });
+
+             map.addSource('amazon', {
+                type: 'geojson',
+                data: './amazon.geojson'
+              });
+
+              map.addSource('cerrado', {
+                 type: 'geojson',
+                 data: './cerrado.geojson'
+               });
+
+               map.addSource('granchaco', {
+                  type: 'geojson',
+                  data: './granchaco.geojson'
+                });
+
+             map.addLayer({
+                'id': 'amazon',
+                'type': 'line',
+                'source': 'amazon',
+                'paint': {
+                'line-color': '#189B68',
+                'line-opacity': 0.9,
+                'line-width':1.5
+                }
+             });
+
+             map.addLayer({
+                'id': 'amazon2',
+                'type': 'fill',
+                'source': 'amazon',
+                'paint': {
+                'fill-color': '#189B68',
+                'fill-opacity': 0.1
+                }
+             });
+
+             map.addLayer({
+                'id': 'cerrado',
+                'type': 'line',
+                'source': 'cerrado',
+                'paint': {
+                'line-color': '#F59487',
+                'line-opacity': 0.9,
+                'line-width':1.5
+                }
+             });
+
+             map.addLayer({
+                'id': 'cerrado2',
+                'type': 'fill',
+                'source': 'cerrado',
+                'paint': {
+                'fill-color': '#F59487',
+                'fill-opacity': 0.1
+                }
+             });
+
+             map.addLayer({
+                'id': 'granchaco',
+                'type': 'line',
+                'source': 'granchaco',
+                'paint': {
+                'line-color': '#FB9159',
+                'line-opacity': 0.9,
+                'line-width':1.5
+                }
+             });
+
+             map.addLayer({
+                'id': 'granchaco2',
+                'type': 'fill',
+                'source': 'granchaco',
+                'paint': {
+                'fill-color': '#FB9159',
+                'fill-opacity': 0.1
+                }
+             });
+
+         });
+
+         if(!mobile){
+           map.addControl(new mapboxgl.NavigationControl());
+         }
+
+
+
+         function init() {
+         Tabletop.init({
+           // YOUR TURN: change 'key' value to point to your spreadsheet
+           key: 'https://docs.google.com/spreadsheets/d/16x8yUA5YWFFH-UkmYxOjU39jJ-PcQRBSQ4Ks04lqBTs/edit?usp=sharing',
+           //'https://docs.google.com/spreadsheets/d/1D6VtVXHUJapRuZxoVpBoukLmYMwZwzYk7qXZeH5gTH8/edit?usp=sharing',
+           // once Tabletop has loaded the data, it passes it to the 'callback' function, 'addPoints', defined below
+           callback: onDataLoad,
+           simpleSheet: true
+         });
+         }
+
+
+         function onDataLoad(data) {
+
+           $('#loading').hide();
+
+         // Create a popup, but don't add it to the map yet.
+         var popup;
+         var firstDate;
+         var lastDate;
+         var totalMonths;
+         var filterMonth = ['>=', ['number', ['get', 'date2Parse']], Date.parse(new Date(2020-01))];
+         //var filterMonth2 = ['<=', ['number', ['get', 'date1Parse']], Date.parse(new Date(2007-02))];
+         var filterProduct = ['==', ['string', ['get', 'product']], 'soy'];
+         var filterYear = ['>=', ['number', ['get', 'date2Parse']], Date.parse(new Date(2020))];
+         //var filterYear2 = ['<=', ['number', ['get', 'date1Parse']], Date.parse(new Date(2007))];
+         var min=1;
+         var max=1;
+         var minCircleSize = 8;
+         var maxCircleSize = 30;
+         var filteredSoyData;
+         var filteredBeefData;
+
+             // iterate through your table to set the marker to lat/long values for each row
+             data.forEach(function (row) {
+
+               var lat;
+               var lon;
+               var year;
+
+               if(row.longitude=='null'){
+                 //console.log(row)
+                 lon = null;
+                 lat = null;
+               }else{
+                 lon = +row.longitude;
+                 lat = +row.latitude;
+               }
+               // to deal with null lat lon values
+
+              if(row.investment ==''){
+
+              }else{
+                if(+row.investment<min){
+                  min=+row.investment;
+                }
+                if(+row.investment>max){
+                  max=+row.investment;
+                }
+              }
+
+               var feature =
+               {
+                 'type': 'Feature',
+                 'properties': {
+                   'longitude': lon,
+                   'latitude': lat,
+                   'year':row.start_time.split("-")[0],
+                   'start_time': row.start_time,
+                   'end_time': row.end_time,
+                   'date1': new Date(row.start_time),
+                   'date2': new Date(row.end_time),
+                   'date1Parse': Date.parse(new Date(row.start_time)),
+                   'date2Parse': Date.parse(new Date(row.end_time)),
+                   'investing_company': row.investing_company,
+                   'destination_sector':row.destination_sector,
+                   'project_type': row.project_type,
+                   'investment':+row.investment,
+                   'private_public':row.private_public,
+                   'product':row.product,
+                   'url':row.link,
+                   'title':row.title,
+                   'local_partner':row.local_partner,
+                   'project':row.project
+                 },
+                 'geometry': {
+                   'type': 'Point',
+                   'coordinates': [row.latitude, row.longitude],
+                 }
+               };
+
+               geoJsonData['features'].push(feature);
+
+             });
+
+
+             map.addLayer({
+                 id: 'soybeef',
+                 type: 'circle',
+                 source: {
+                     type: 'geojson',
+                     data: geoJsonData
+                 },
+                 paint: {
+                   "circle-color": [
+                     "case",
+                     ["==", ["get", "destination_sector"], 'Logistics'],
+                     "#007979",
+                     ["==", ["get", "destination_sector"], 'Production'],
+                     "#D66951",
+                     ["==", ["get", "destination_sector"], 'Processing'],
+                     '#67C14D',
+                     "#FFC554"
+                   ],
+                     'circle-radius': [
+                       'interpolate',
+                       ['linear'],
+                       ['get', 'investment'],
+                       min,
+                       minCircleSize,
+                       max,
+                       maxCircleSize
+                     ],
+                     'circle-opacity': 0.7
+                 }
+             });
+
+             //if iphone or safari then remove slider option and use dropdown option, which is based on year and not year-month
+             if(iphone || safari){
+               map.setFilter('soybeef', ['all', filterProduct, filterYear]);
+             }else{
+               map.setFilter('soybeef', ['all', filterProduct, filterMonth]);
+             }
+
+             var maxInBillions = max/1000;
+
+             $("#minCircleVal").html(`${min} US$million`);
+             $("#maxCircleVal").html(`${maxInBillions} US$billion`);
+
+
+             //GET DATES & populate slider
+               var allDates = [];
+               var allMonths = [];
+               var allYears = []; // to populate mobile dropdown
+
+               geoJsonData.features.forEach(function (feature) {
+               //  console.log(feature)
+                   var obj = {};
+                   obj['date']=feature.properties.date1;
+                   allDates.push(obj);
+               });
+
+               geoJsonData.features.forEach(function (feature) {
+                 //console.log(feature)
+                   var obj = {};
+                   obj['date']=feature.properties.date2;
+                   allDates.push(obj);
+               });
+
+             //  console.log(allDates);
+               allDates.sort((a, b) => b.date - a.date)
+
+               lastDate = formatDate(allDates[0].date);
+               firstDate = formatDate(allDates[allDates.length-1].date);
+
+               $("#start").html(firstDate);
+               $("#end").html(lastDate);
+
+               var finalYear = lastDate.split("-")[0];//for mobile purposes and title
+               var firstYear = firstDate.split("-")[0]; // for mobile purposes only
+
+               allYears = getAllYears(firstYear,finalYear);
+
+               $("#title").html(`Chinese Investments in South American Soy and Beef (2007-${finalYear})`);
+
+               // console.log(allDates)
+               totalMonths = calculateTotalMonths(firstDate,lastDate);
+               $('#slider').prop('min', 1); // not sure why but if I do 0 here then it goes to 2007 January instead of Feb
+               $('#slider').prop('max', totalMonths);
+               $('#slider').prop('value', totalMonths);
+
+               allMonths = getAllMonths(firstDate,lastDate);
+
+               // this part is just to get the final cumulative values for both soy and beef and compare which is bigger
+               // the bigger value sets the max limit of the y scale extent
+               filteredSoyData=geoJsonData.features.filter(function(d){
+                 return d.properties.product == 'soy';
+               })
+               filteredBeefData=geoJsonData.features.filter(function(d){
+                 return d.properties.product == 'beef';
+               })
+               var cumulativeDataSoy = cumulativeByYear2(filteredSoyData,firstDate, lastDate);
+               var cumulativeDataBeef = cumulativeByYear2(filteredBeefData,firstDate, lastDate);
+               finalCumulative = Math.max(cumulativeDataSoy[cumulativeDataSoy.length-1]['cumulative'],cumulativeDataBeef[cumulativeDataBeef.length-1]['cumulative'])
+               //for y-axis extent
+
+               var cumulativeData = cumulativeByYear(geoJsonData,firstDate, lastDate);
+               drawChart(cumulativeData);
+               finalYear = cumulativeData[cumulativeData.length-1]['year'];//for x-axis extent
+
+
+               if(!iphone && !safari){//if not iphone then slider
+               document.getElementById('slider').addEventListener('input', function(e) {
+                 var dateSlider = e.target.value;
+                 var dateSliderConv = convertValueToDate((parseInt(dateSlider)-1)); //new Date... why -1?
+
+                 // filterMonth = [   "all",
+                 //       ['>=', 'date2Parse', Date.parse(new Date(dateSliderConv))],
+                 //       ['<=', 'date1Parse', Date.parse(new Date(dateSliderConv))]
+                 // ];
+
+                 var sliderYear = dateSliderConv.split("-")[0];
+                 cumulativeData = cumulativeByYear(geoJsonData,firstDate, lastDate);
+
+                 cumulativeData = cumulativeData.filter(function(d){
+                     return d.year <= +sliderYear;
+                 });
+                 updateChart(sliderYear,cumulativeData,finalCumulative,finalYear);
+
+                 filterMonth = ['<=', ['number', ['get', 'date1Parse']], Date.parse(new Date(dateSliderConv))];
+                 //filterMonth2 = ['>=', ['number', ['get', 'date2Parse']], Date.parse(new Date(dateSliderConv))];
+
+                 //console.log(dateSliderConv)
+
+                 map.setFilter('soybeef', ['all', filterProduct, filterMonth]);
+
+                 var month = convertNumToMonth(dateSliderConv);
+                 var year = dateSliderConv.split("-")[0];
+
+                 document.getElementById('active-date2').innerText = year+' '+month;
+
+                 //document.getElementById('active-date').innerText = dateSliderConv;
+               }); //end slider input
+             }else{ //if iphone then dropdown
+
+               $("#dropdown").on("click change", function(e) {
+                  // $("#activeYear").html(e.target.value);
+                  filterYear = ['<=', ['number', ['get', 'date1Parse']], Date.parse(new Date(e.target.value))];
+                  //filterYear2 = ['>=', ['number', ['get', 'date2Parse']], Date.parse(new Date(e.target.value))];
+                  map.setFilter('soybeef', ['all', filterProduct, filterYear]);
+              });
+
+             }
+
+
+
+                 document.getElementById('filters').addEventListener('change', function(e) {
+                   var category = e.target.value;
+                   var sliderValue =  document.getElementById('slider').value;
+                   var dateSliderConv = convertValueToDate((parseInt(sliderValue)-1));
+                   var sliderYear = dateSliderConv.split("-")[0];
+
+                   // update the map filter
+                   if (category === 'soy') {
+                     soy = true;
+                     filterProduct = ['==', ['string', ['get', 'product']], 'soy'];
+                     cumulativeData = cumulativeByYear(geoJsonData,firstDate, lastDate);
+                     cumulativeData = cumulativeData.filter(function(d){
+                         return d.year <= +sliderYear;
+                     });
+                     updateChart(sliderYear,cumulativeData,finalCumulative,finalYear);
+                     $("#soyTitle").css("font-weight",700);
+                     $("#beefTitle").css("font-weight",400);
+                   } else if (category === 'beef') {
+                     soy = false;
+                     filterProduct = ['==', ['string', ['get', 'product']], 'beef'];
+                     cumulativeData = cumulativeByYear(geoJsonData,firstDate, lastDate);
+                     cumulativeData = cumulativeData.filter(function(d){
+                         return d.year <= +sliderYear;
+                     });
+                     updateChart(sliderYear,cumulativeData,finalCumulative,finalYear);
+                     $("#soyTitle").css("font-weight",400);
+                     $("#beefTitle").css("font-weight",700);
+                   } else {
+                     console.log('error');
+                   }
+
+                   if(iphone || safari){
+                      map.setFilter('soybeef', ['all', filterProduct, filterYear]);
+                   }else{
+                     map.setFilter('soybeef', ['all', filterProduct, filterMonth]);
+                   }
+                 });
+
+
+             function getAllMonths(firstDate, lastDate){
+               var firstYear = firstDate.split("-")[0];
+               var lastYear = lastDate.split("-")[0];
+               var firstMonth = firstDate.split("-")[1];
+               var lastMonth = lastDate.split("-")[1];
+
+               var allMonths = [];
+
+               //first year
+               for(var j=parseInt(firstMonth);j<13;j++){
+                 var date;
+                 if(j<10){
+                   date = firstYear+'-0'+j.toString();
+                 }else{
+                   date=firstYear+'-'+j.toString();
+                 }
+                 allMonths.push(date);
+               }
+
+               //all years in between firstYear+1 and lastYear-1
+
+               for(var i=(parseInt(firstYear)+1); i<parseInt(lastYear);i++){
+                 for (var j=1; j<13; j++){
+                   var year = i.toString();
+                   var month = j.toString();
+                   var date;
+                   if(j<10){
+                     date=year+'-0'+month;
+                   }else{
+                     date=year+'-'+month;
+                   }
+                     allMonths.push(date);
+                 }
+               }
+
+               //last year
+
+               for(var j=1;j<(parseInt(lastMonth)+1);j++){
+                 var date;
+                 if(j<10){
+                   date = lastYear+'-0'+j.toString();
+                 }else{
+                   date=lastYear+'-'+j.toString();
+                 }
+                 allMonths.push(date);
+               }
+
+                 //console.log(allMonths);
+
+                 return allMonths;
+
+             }//end getAllMonths
+
+
+
+             //mobile specific functions
+             //get all years to create dropdown menu
+             function getAllYears(firstYear,lastYear){
+               firstYear = parseInt(firstYear);
+               lastYear = parseInt(lastYear);
+
+               var html='';
+
+               for(var i=firstYear;i<=lastYear;i++){
+                 console.log(i)
+                 allYears.push(i);
+                  html = `<option>${i}</option>`
+                  var menu = document.getElementById('dropdown');
+                  menu.options[menu.options.length] = new Option(i, i);
+               }
+
+               $("#dropdown").val(lastYear).find("option[value=" + lastYear +"]").attr('selected', true);
+               // set last year as default
+             }
+
+
+             function convertValueToDate(value) {
+                 var scale = d3.scaleLinear().domain([...Array(totalMonths).keys()]).range(allMonths);
+                 //console.log([...Array(totalMonths).keys()])
+                 //console.log(value)
+                 //console.log(scale(value))
+                 return scale(value);
+             }
+
+          // for example 1 becomes January
+         function convertNumToMonth(date){
+           var month= date.split("-")[1];
+           //console.log(month);
+           if(month==1){
+             return 'January';
+           }else if(month==2){
+             return 'February';
+           }else if(month==3){
+             return 'March';
+           }else if(month==4){
+             return 'April';
+           }else if(month==5){
+             return 'May';
+           }else if(month==6){
+             return 'June';
+           }else if(month==7){
+             return 'July';
+           }else if(month==8){
+             return 'August';
+           }else if(month==9){
+             return 'September';
+           }else if(month==10){
+             return 'October';
+           }else if(month==11){
+             return 'November';
+           }else{
+             return 'December';
+           }
+         }
+
+         function calculateTotalMonths(firstDate, lastDate){
+                 var firstYear = firstDate.split("-")[0];
+                 var lastYear = lastDate.split("-")[0];
+                 var firstMonth = firstDate.split("-")[1];
+                 var lastMonth = lastDate.split("-")[1];
+                 var totalMonths = (lastYear-firstYear)*12+(lastMonth-firstMonth)+1;
+                 return totalMonths;
+         }
+
+          function filterByTime(month1, month2) {
+             var filters = ['>=', 'month', month1];
+             map.setFilter('soybeef', filters);
+             var filters2 = ['<=', 'month', month2];
+             map.setFilter('soybeef', filters2);
+           }
+
+
+
+          function formatDate(d) {
+             var month = '' + (d.getMonth() + 1),
+                 day = '' + d.getDate(),
+                 year = d.getFullYear();
+
+             if (month.length < 2)
+                 month = '0' + month;
+             if (day.length < 2)
+                 day = '0' + day;
+             return [year, month].join('-');
+           }
+
+           function cumulativeByYear(data,firstDate, lastDate){
+
+             //console.log(data)
+             var newData;
+             if(soy){
+               newData =data.features.filter(function(d){
+                 return d.properties.product == 'soy';
+               })
+
+             }else{
+               newData = data.features.filter(function(d){
+                 return d.properties.product == 'beef';
+               })
+             }
+
+             var firstYear = firstDate.split("-")[0];
+             var lastYear = lastDate.split("-")[0];
+
+             var yearCumulative = [];
+             var finalCumulative;
+             var finalYear;
+
+             for(var i = firstYear; i <=lastYear; i++){
+               var newObj = {};
+               newObj['year']=+i;
+               newObj['value']=0;
+               newObj['cumulative']=0;
+               yearCumulative.push(newObj);
+             }
+
+             //console.log(yearCumulative)
+
+             var totalValue = 0;
+
+             //console.log(data)
+             //console.log(newData)
+
+             newData.forEach(function(d){
+               //console.log(d);
+               for(var i = 0; i <yearCumulative.length; i++){
+                 //console.log(+d.properties.start_time.split("-")[0])
+                 //console.log(yearCumulative[i].year)
+                 if(+d.properties.start_time.split("-")[0]==yearCumulative[i].year){
+                   //console.log(yearCumulative[i].value);
+                   //console.log(d.properties.investment);
+                   yearCumulative[i].value = yearCumulative[i].value+d.properties.investment;
+                 }
+                 if(i>0){
+                   yearCumulative[i].cumulative = yearCumulative[i].value + yearCumulative[i-1].cumulative
+                 }else{
+                   yearCumulative[i].cumulative = yearCumulative[i].value;
+                 }
+               }
+
+               //console.log(yearCumulative);
+
+             });
+
+             return yearCumulative;
+
+           }
+
+
+           // same as cumulativeByYear but without soy/beef filter, pass in already filtered data
+           // purpose is only to get the final cumulative data for both soy and beef and compare which value is bigger
+           // the bigger value will set the extent of the yAxis
+           function cumulativeByYear2(data,firstDate, lastDate){
+
+
+             var firstYear = firstDate.split("-")[0];
+             var lastYear = lastDate.split("-")[0];
+
+             var yearCumulative = [];
+             var finalCumulative;
+             var finalYear;
+
+             for(var i = firstYear; i <=lastYear; i++){
+               var newObj = {};
+               newObj['year']=+i;
+               newObj['value']=0;
+               newObj['cumulative']=0;
+               yearCumulative.push(newObj);
+             }
+
+             var totalValue = 0;
+
+             data.forEach(function(d){
+               for(var i = 0; i <yearCumulative.length; i++){
+                 if(+d.properties.start_time.split("-")[0]==yearCumulative[i].year){
+                   yearCumulative[i].value = yearCumulative[i].value+d.properties.investment;
+                 }
+                 if(i>0){
+                   yearCumulative[i].cumulative = yearCumulative[i].value + yearCumulative[i-1].cumulative
+                 }else{
+                   yearCumulative[i].cumulative = yearCumulative[i].value;
+                 }
+               }
+             });
+             return yearCumulative;
+           }
+
+
+           function drawChart(data){
+
+              var f = d3.format("0.2s");
+
+               yScale.domain(d3.extent(data, d => d.cumulative)).nice();
+               xScale.domain(d3.extent(data, d => d.year)).nice();
+               xAxis.ticks(data.length/2).tickFormat(d3.format("d"));
+               //add .tickFormat(d3.format("d")) to remove comma
+               yAxis.ticks(data.length/2).tickFormat(function(d){return d/1000});
+               // so it's in billion format
+
+                 chart.append("path")
+                   .datum(data)
+                   .attr("class","line")
+                   .attr("fill", "none")
+                   .attr("stroke", "#59BECD")
+                   .attr("stroke-linejoin", "round")
+                   .attr("stroke-linecap", "round")
+                   .attr("stroke-width", 2.5)
+                   .attr("d", line);
+
+                 // Add the X Axis
+                 chart.selectAll(".Xaxis").transition()
+                       .duration(1000)
+                       .call(xAxis);
+               // Add the Y Axis
+               chart.selectAll(".Yaxis").transition()
+                     .duration(1000)
+                     .call(yAxis);
+           }
+
+           function updateChart(sliderYear,data,finalCumulative,finalYear){
+
+               // yScale.domain(d3.extent(data, d => d.cumulative));
+               // xScale.domain(d3.extent(data, d => d.year));
+               yScale.domain([70,finalCumulative]);
+               xScale.domain([2007,finalYear]);
+               xAxis.ticks(data.length/2).tickFormat(d3.format("d"));
+               yAxis.ticks(data.length/2).tickFormat(function(d){return d/1000});
+
+               d3.select(".line")
+                 .transition().duration(50)
+                 .attr("d", line(data))
+                 .attr("stroke",function(){
+                     return soy?"#59BECD":"#9573DE";
+                 });
+
+
+                //uncomment below to have the axes also update
+                 // Add the X Axis
+               //   chart.selectAll(".Xaxis").transition()
+               //         .duration(50)
+               //         .call(xAxis);
+               // // Add the Y Axis
+               // chart.selectAll(".Yaxis").transition()
+               //       .duration(50)
+               //       .call(yAxis);
+           }
+
+
+
+         var myTimer;
+         d3.select("#play").on("click", function() {
+           $("#stop img").css("opacity",1);
+           $("#play img").css("opacity",0.6);
+          clearInterval (myTimer);
+         	myTimer = setInterval (function() {
+             	 var b = d3.select("#slider");
+               var t = (+b.property("value")+1) % (+b.property("max")+1);
+               if (t == 1) { t = +b.property("min"); }
+               b.property("value", t);
+               if( t == (+b.property("max"))){ //to stop the loop
+                 clearInterval (myTimer);
+                 $("#stop img").css("opacity",0.6);
+                 $("#play img").css("opacity",1);
+               }
+               var dateSliderConv = convertValueToDate((parseInt(t)-1));
+               filterMonth = ['<=', ['number', ['get', 'date1Parse']], Date.parse(new Date(dateSliderConv))];
+               map.setFilter('soybeef', ['all', filterProduct, filterMonth]);
+               //document.getElementById('active-date').innerText = dateSliderConv;
+               var month = convertNumToMonth(dateSliderConv);
+               var sliderYear = dateSliderConv.split("-")[0];
+               document.getElementById('active-date2').innerText = sliderYear+' '+month;
+
+               cumulativeData = cumulativeByYear(geoJsonData,firstDate, lastDate);
+               cumulativeData = cumulativeData.filter(function(d){
+                   return d.year <= +sliderYear;
+               });
+               updateChart(sliderYear,cumulativeData,finalCumulative,finalYear);
+
+             }, 60);
+         });
+
+         d3.select("#stop").on("click", function() {
+         	clearInterval (myTimer);
+          $("#play img").css("opacity",1);
+          $("#stop img").css("opacity",0.6);
+         });
+
+
+          map.on('click', 'soybeef', function(e) {
+            map.getCanvas().style.cursor = 'pointer';
+            var latitude = e.features[0].properties.latitude;
+            var longitude = e.features[0].properties.longitude;
+            var sector = e.features[0].properties.destination_sector;
+            var investment = e.features[0].properties.investment;
+            var status = e.features[0].properties.private_public;
+            var product = e.features[0].properties.product;
+            var investing_company = e.features[0].properties.investing_company;
+            var project_type = e.features[0].properties.project_type;
+            var date1 = e.features[0].properties.start_time;
+            var date2 = e.features[0].properties.end_time;
+            var url = e.features[0].properties.url;
+            var title = e.features[0].properties.title;
+            var local_partner = e.features[0].properties.local_partner;
+            var project_description = e.features[0].properties.project;
+
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - latitude) > 180) {
+                latitude += e.lngLat.lng > latitude ? 360 : -360;
+            }
+
+            // Populate the popup and set its coordinates
+            // based on the feature found.
+            // create a variable for your popup for the current event
+
+            var popupClass="";
+            if(sector == 'Logistics'){
+              popupClass = 'logistics';
+            }else if(sector=='Production'){
+              popupClass = 'production';
+            }else if(sector=='Processing'){
+             popupClass = 'processing';
+            }else{
+              popupClass = 'other';
+            }
+
+            var local_partner_title = '';
+            if(project_type=='New' || project_type=='Contract' || project_type=='Load'){
+              local_partner_title = 'Project';
+            }else{
+              local_partner_title = 'Company';
+            }
+
+            var investment_w_unit ='';
+
+            if(investment >= 1000){
+              investment_w_unit = investment/1000 + ' billion'
+            }else{
+              investment_w_unit = investment+ ' million';
+            }
+
+
+
+
+            if(url === undefined || url === null || url === ""){
+
+              popup = new mapboxgl.Popup({closeButton: true, closeOnClick: true, className:popupClass})
+                  .setHTML('<h3 class="popupTitle">' + title + '</h3>'
+                  + '<h4><b> Investing company: </b>' + investing_company + '</h4>'
+                  + '<h4><b> Project / Target company: </b>' + local_partner + '</h4>'
+                  // + '<h4><b>' +local_partner_title+': </b>' + local_partner + '</h4>'
+                  + '<h4><b> Project: </b>' + project_description + '</h4>'
+                  + '<h4><b> Sector:</b> '  + sector + '</h4>'
+                  + '<h4><b> Type:</b> '  + project_type + '</h4>'
+                  // + '<h4><b> Investment:</b> US$'  + investment + ' million </h4>')
+                  + '<h4><b> Investment:</b> US$'  + investment_w_unit + '</h4>')
+                  .setLngLat([latitude,longitude])
+                  .addTo(map);
+
+            }else{
+              popup = new mapboxgl.Popup({closeButton: true, closeOnClick: true, className:popupClass})
+                  .setHTML('<h3 class="popupTitle">' + title + '</h3>'
+                  + '<h4><b> Investing company: </b>' + investing_company + '</h4>'
+                  + '<h4><b> Project / Target company: </b>' + local_partner + '</h4>'
+                  + '<h4><b> Project: </b>' + project_description + '</h4>'
+                  + '<h4><b> Sector:</b> '  + sector + '</h4>'
+                  + '<h4><b> Type:</b> '  + project_type + '</h4>'
+                  // + '<h4><b> Investment:</b> US$'  + investment + ' million </h4>'
+                  + '<h4><b> Investment:</b> US$'  + investment_w_unit + '</h4>'
+                  + `<div class="button ${popupClass}"><a target="_blank" href="${url}">Read More</a></div>`)
+                  .setLngLat([latitude,longitude])
+                  .addTo(map);
+            }
+
+            if(sector == 'Logistics'){
+              $(`.button.${popupClass}`).hover(function(){
+                console.log("hover")
+                $(".button a").css("color","white");
+                $(this).css("background-color","#007979");
+               },function(){
+                 $(".button a").css("color","#007979");
+                 $(this).css("background-color","white");
+               });
+               $(".mapboxgl-popup-tip").css("border-bottom-color","#007979");
+            }else if(sector=='Production'){
+              $(`.button.${popupClass}`).hover(function(){
+                console.log("hover")
+                $(".button a").css("color","white");
+                $(this).css("background-color","#D66951");
+              },function(){
+                $(".button a").css("color","#D66951");
+                $(this).css("background-color","white");
+              });
+              $(".mapboxgl-popup-tip").css("border-bottom-color","#D66951");
+            }else if(sector=='Processing'){
+              $(`.button.${popupClass}`).hover(function(){
+                console.log("hover")
+                $(".button a").css("color","white");
+                $(this).css("background-color","#67C14D");
+              },function(){
+                $(".button a").css("color","#67C14D");
+                $(this).css("background-color","white");
+              });
+              $(".mapboxgl-popup-tip").css("border-bottom-color","#67C14D");
+            }else{
+              $(`.button.${popupClass}`).hover(function(){
+                console.log("hover")
+                $(".button a").css("color","white");
+                $(this).css("background-color","#FFC554");
+              },function(){
+                $(".button a").css("color","#FFC554");
+                $(this).css("background-color","white");
+              });
+              $(".mapboxgl-popup-tip").css("border-bottom-color","#FFC554");
+            }
+
+         });
+
+
+         map.on('mouseenter', 'soybeef', function(e) {
+         map.getCanvas().style.cursor = 'pointer';
+         });
+
+
+         map.on('mouseleave', 'soybeef', function() {
+             map.getCanvas().style.cursor = '';
+             // popup.remove();
+         });
+
+         //Mobile touch events
+
+         map.on('touchstart', 'soybeef', function(e) {
+           map.getCanvas().style.cursor = 'pointer';
+           var latitude = e.features[0].properties.latitude;
+           var longitude = e.features[0].properties.longitude;
+           var sector = e.features[0].properties.destination_sector;
+           var investment = e.features[0].properties.investment;
+           var status = e.features[0].properties.private_public;
+           var product = e.features[0].properties.product;
+           var investing_company = e.features[0].properties.investing_company;
+           var project_type = e.features[0].properties.project_type;
+           var date1 = e.features[0].properties.start_time;
+           var date2 = e.features[0].properties.end_time;
+           var url = e.features[0].properties.url;
+           var title = e.features[0].properties.title;
+           var local_partner = e.features[0].properties.local_partner;
+           var project_description = e.features[0].properties.project;
+
+
+           // Ensure that if the map is zoomed out such that multiple
+           // copies of the feature are visible, the popup appears
+           // over the copy being pointed to.
+           while (Math.abs(e.lngLat.lng - latitude) > 180) {
+               latitude += e.lngLat.lng > latitude ? 360 : -360;
+           }
+
+           // Populate the popup and set its coordinates
+           // based on the feature found.
+           // create a variable for your popup for the current event
+
+           var popupClass="";
+           if(sector == 'Logistics'){
+             popupClass = 'logistics';
+           }else if(sector=='Production'){
+             popupClass = 'production';
+           }else if(sector=='Processing'){
+            popupClass = 'processing';
+           }else{
+             popupClass = 'other';
+           }
+
+           var investment_w_unit ='';
+
+           if(investment >= 1000){
+             investment_w_unit = investment/1000 + ' billion'
+           }else{
+             investment_w_unit = investment+ ' million';
+           }
+
+
+           if(url === undefined || url === null || url === ""){
+
+             popup = new mapboxgl.Popup({closeButton: true, closeOnClick: true, className:popupClass})
+                 .setHTML('<h3 class="popupTitle">' + title + '</h3>'
+                 + '<h4><b> Investing company: </b>' + investing_company + '</h4>'
+                 + '<h4><b> Project / Target company: </b>' + local_partner + '</h4>'
+                 + '<h4><b> Project: </b>' + project_description + '</h4>'
+                 + '<h4><b> Sector:</b> '  + sector + '</h4>'
+                 + '<h4><b> Type:</b> '  + project_type + '</h4>'
+                 // + '<h4><b> Investment:</b> US$'  + investment + ' million </h4>')
+                 + '<h4><b> Investment:</b> US$'  + investment_w_unit + '</h4>')
+                 .setLngLat([latitude,longitude])
+                 .addTo(map);
+
+           }else{
+             popup = new mapboxgl.Popup({closeButton: true, closeOnClick: true, className:popupClass})
+                 .setHTML('<h3 class="popupTitle">' + title + '</h3>'
+                 + '<h4><b> Investing company: </b>' + investing_company + '</h4>'
+                 + '<h4><b> Project / Target company: </b>' + local_partner + '</h4>'
+                 + '<h4><b> Project: </b>' + project_description + '</h4>'
+                 + '<h4><b> Sector:</b> '  + sector + '</h4>'
+                 + '<h4><b> Type:</b> '  + project_type + '</h4>'
+                 // + '<h4><b> Investment:</b> US$'  + investment + ' million </h4>'
+                 + '<h4><b> Investment:</b> US$'  + investment_w_unit + '</h4>'
+                 + `<div class="button ${popupClass}"><a target="_blank" href="${url}">Read More</a></div>`)
+                 .setLngLat([latitude,longitude])
+                 .addTo(map);
+           }
+         });
+
+        }  //end onDataLoad
+
+
+      </script>
+   </body>
+   <div id="loading">
+      <img id="loading-image" src="load.gif" alt="Loading..." />
+   </div>
+</html>
