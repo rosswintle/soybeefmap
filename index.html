@@ -622,7 +622,7 @@
               </div>
             </div>
             <div class="instruction itemWrapper">
-               <p class="item">Click on the points for more information</p>
+               <p class="item">Click on the circles for more information</p>
                <img class="item arrow" src="./img/arrow.svg"/>
             </div>
          </div>
@@ -1040,8 +1040,8 @@
 
              var maxInBillions = max/1000;
 
-             $("#minCircleVal").html(`${min} US$million`);
-             $("#maxCircleVal").html(`${maxInBillions} US$billion`);
+             $("#minCircleVal").html(`US$${min} million`);
+             $("#maxCircleVal").html(`US$${maxInBillions} billion`);
 
 
              //GET DATES & populate slider
